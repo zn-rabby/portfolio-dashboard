@@ -67,8 +67,7 @@ export default function AddProjectForm() {
         toast.error(response?.error?.[0]?.message || "Error adding project");
       }
     } catch (error:any) {
-      toast.error("Something went wrong!");
-      console.log(error)
+      toast.error("Something went wrong!",error);
     }
   };
 

@@ -13,7 +13,6 @@ export const registerUser = async (userData: FieldValues) => {
       },
       body: JSON.stringify(userData),
     });
-    console.log(res,"res")
     const result = await res.json();
 
     if (result.success) {

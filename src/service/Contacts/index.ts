@@ -1,3 +1,5 @@
+"use server";
+
 // export const getAllContacts = async (page?: string, limit?: string) => {
 //     try {
 //       const res = await fetch(

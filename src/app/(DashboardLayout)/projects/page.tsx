@@ -7,7 +7,6 @@ import { getAllProjects } from "@/service/Project";
 export default async function ProjectsPage() {
   const { data } = await getAllProjects();
   const projects = data ?? [];
-  console.log(44,projects)
 
   return (
     <div className="w-full">
