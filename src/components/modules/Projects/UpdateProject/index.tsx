@@ -15,12 +15,10 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { TProject } from "@/types/user";

@@ -2,16 +2,9 @@
 
 import * as React from "react";
 import {
-  Frame,
-  Map,
-  PieChart,
-  Settings,
-  User,
-  ShoppingCart,
-  BarChart,
-  List,
-  HelpCircle,
-  MessageCircle,
+  MessageCircle, // For Contact SMS
+  PlusCircle,    // For Create Project
+  Folder,        // For Projects
 } from "lucide-react";
 
 import {
@@ -26,77 +19,26 @@ import {
 import Link from "next/link";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
+
 const data = {
   navMain: [
-    
     {
       title: "Contact SMS",
       url: "/contact",
-      icon: User, // Changed to User icon
+      icon: MessageCircle, // Appropriate icon for Contact SMS
       isActive: true,
     },
     {
       title: "Create Project",
-    url: "/projects/create-project",
-      icon: ShoppingCart, // Changed to ShoppingCart icon
+      url: "/projects/create-project",
+      icon: PlusCircle, // Appropriate icon for Create Project
       isActive: true,
     },
     {
       title: "Projects",
       url: "/projects",
-      icon: BarChart, // Changed to BarChart icon
+      icon: Folder, // Appropriate icon for Projects
       isActive: true,
-    },
-    {
-      title: "Listing",
-      url: "/dashboard/listing",
-      icon: List, // Changed to List icon
-      items: [
-        {
-          title: "Manage Listing",
-          url: "/dashboard/listing",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-      items: [
-        {
-          title: "Profile",
-          url: "/dashboard/profile",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: HelpCircle, // Changed to HelpCircle icon
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: MessageCircle, // Changed to MessageCircle icon
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
     },
   ],
 };
@@ -109,11 +51,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <div className="flex items-center justify-center">
-                  RRR
-                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <h2 className="font-bold text-xl">ReCycleMart</h2>
+                  <h2 className="font-bold text-xl">Rabby</h2>
                 </div>
               </Link>
             </SidebarMenuButton>
