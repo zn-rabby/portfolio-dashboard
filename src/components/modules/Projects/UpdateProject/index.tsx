@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import {
   Select,
@@ -22,53 +22,47 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-// import { updateProjectById } from "@/app/services/Project";
 import { useRouter } from "next/navigation";
 import { TProject } from "@/types/user";
 import { updateProjectById } from "@/service/Project";
 
 export default function UpdateProjectForm({ project }: { project: TProject }) {
   const router = useRouter();
-
-  const roles = [
-    { value: "frontend", label: "Frontend Developer" },
-    { value: "backend", label: "Backend Developer" },
-    { value: "fullstack", label: "Full-Stack Developer" },
-    { value: "ui-ux", label: "UI/UX Designer" },
-  ];
+  const [imageLinks, setImageLinks] = useState<string[]>(project?.image || []);
 
   const technologies = [
-    { value: "javascript", label: "Javascript" },
-    { value: "typescript", label: "Typescript" },
-    { value: "mongodb", label: "Mongodb" },
-    { value: "mongoose", label: "Mongoose" },
-    { value: "tailwindCss", label: "Tailwind Css" },
-    { value: "shadcnUi", label: "Shadcn/Ui" },
-    { value: "antDesign", label: "Ant Design" },
-    { value: "materialUi", label: "MaterialUi" },
-    { value: "jwt", label: "Json Web Token" },
-    { value: "other", label: "other" },
+    "javascript",
+    "typescript",
+    "mongodb",
+    "mongoose",
+    "tailwindCss",
+    "shadcnUi",
+    "antDesign",
+    "materialUi",
+    "jwt",
+    "other",
+  ];
+
+  const statusOptions = [
+    { value: "ongoing", label: "Ongoing" },
+    { value: "completed", label: "Completed" },
+    { value: "onHold", label: "On Hold" },
   ];
 
   const form = useForm({
     defaultValues: {
+      name: project?.name || "",
+      category: project?.category || "",
       title: project?.title || "",
-      thumbnail: project?.thumbnail || "",
       description: project?.description || "",
-      projectRole: project?.projectRole || "",
-      technologiesUsed: project?.technologiesUsed || [],
-      challengesFaced: project?.challengesFaced || "",
-      solution: project?.solution || "",
+      image: project?.image || [],
+      technologies: project?.technologies || [],
       keyFeatures: project?.keyFeatures || [],
-      liveLink: project?.liveLink || "",
-      frontendSourceCode: project?.frontendSourceCode || "",
-      backendSourceCode: project?.backendSourceCode || "",
-      apiDocumentation: project?.apiDocumentation || "",
+      status: project?.status || "ongoing",
+      liveDemoLink: project?.liveDemoLink || "",
+      repoLinkClient: project?.repoLinkClient || "",
+      repoLinkServer: project?.repoLinkServer || "",
       projectGoals: project?.projectGoals || "",
-      futureImprovements: project?.futureImprovements || "",
-      securityConsiderations: project?.securityConsiderations || "",
-      projectTimeline: project?.projectTimeline || "",
-      isFeatured: project?.isFeatured || false,
     },
   });
 
@@ -76,18 +70,28 @@ export default function UpdateProjectForm({ project }: { project: TProject }) {
     formState: { isSubmitting },
   } = form;
 
+  const handleImageLinksChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const links = e.target.value.split(",").map((link) => link.trim());
+    setImageLinks(links);
+    form.setValue("image", links);
+  };
+
+  const handleKeyFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const features = e.target.value.split("\n").map((feature) => feature.trim());
+    form.setValue("keyFeatures", features);
+  };
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const response = await updateProjectById(project?._id, data);
-
       if (response?.success) {
         toast.success(response?.message);
         router.push("/projects");
       } else {
-        toast.error(response.error[0]?.message);
+        toast.error(response?.error?.[0]?.message || "Error updating project");
       }
-    } catch {
-      toast.error("Something went wring!");
+    } catch (error) {
+      toast.error("Something went wrong!");
     }
   };
 
@@ -95,419 +99,185 @@ export default function UpdateProjectForm({ project }: { project: TProject }) {
     <Fragment>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-4">
-            {/* title and thumbnail */}
-            <div className="flex flex-col xl:flex-row gap-5">
-              {/* title */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Title <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter your project title"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          {/* Name */}
+          <FormField control={form.control} name="name" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Project name" required />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Category */}
+          <FormField control={form.control} name="category" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Project category" required />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Title */}
+          <FormField control={form.control} name="title" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Project title" required />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Image Links */}
+          <FormItem>
+            <FormLabel>Image Links (comma-separated)</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="Enter image links"
+                value={imageLinks.join(",")}
+                onChange={handleImageLinksChange}
+              />
+            </FormControl>
+          </FormItem>
+
+          {/* Description */}
+          <FormField control={form.control} name="description" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  className="min-h-52"
+                  placeholder="Enter project description"
+                  required
                 />
-              </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
 
-              {/* thumbnail */}
-              <div className=" flex-1">
-                <FormField
-                  control={form.control}
-                  name="thumbnail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Thumbnail URL <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter thumbnail URL"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          {/* Technologies Used */}
+          <FormField control={form.control} name="technologies" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Technologies Used <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <select
+                  multiple
+                  value={field.value}
+                  onChange={(e) => field.onChange([...e.target.selectedOptions].map((o) => o.value))}
+                  className="w-full min-h-36 border-2 border-gray-300"
+                  required
+                >
+                  {technologies.map((tech) => (
+                    <option key={tech} value={tech}>
+                      {tech}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Key Features */}
+          <FormField control={form.control} name="keyFeatures" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Key Features <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter key features (one per line)"
+                  value={field.value.join("\n")}
+                  onChange={handleKeyFeaturesChange}
+                  className="min-h-36"
+                  required
                 />
-              </div>
-            </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
 
-            {/* description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Description <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter project description"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {/* Status */}
+          <FormField control={form.control} name="status" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status <span className="text-red-500">*</span></FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
 
-            <div className="flex flex-col xl:flex-row gap-5">
-              {/* Project Role */}
+          {/* Live Demo Link */}
+          <FormField control={form.control} name="liveDemoLink" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Live Demo Link</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter live demo link" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
 
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="projectRole"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Project Role <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {roles.map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          {/* Repository Link (Client) */}
+          <FormField control={form.control} name="repoLinkClient" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Repository Link (Client)</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter client repository link" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Repository Link (Server) */}
+          <FormField control={form.control} name="repoLinkServer" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Repository Link (Server)</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter server repository link" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* Project Goals */}
+          <FormField control={form.control} name="projectGoals" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Project Goals</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  placeholder="Enter project goals"
+                  className="min-h-36"
                 />
-              </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
 
-              {/* Project Timeline */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="projectTimeline"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Project Timeline <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter project timeline"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* technologies used */}
-            <div className="space-y-2">
-              <Label htmlFor="technologiesUsed" className="text-white">
-                Technologies Used<span className="text-red-500 ml-1">*</span>
-              </Label>
-              <select
-                className="w-full min-h-36 border-2 border-[#27272A]"
-                name="technologiesUsed"
-                multiple
-                value={form.watch("technologiesUsed")}
-                onChange={(e) =>
-                  form.setValue(
-                    "technologiesUsed",
-                    [...e.target.selectedOptions].map((o) => o.value)
-                  )
-                }
-                required
-              >
-                {technologies.map((tech) => (
-                  <option
-                    key={tech.value}
-                    value={tech.value}
-                    className="text-sm"
-                  >
-                    {tech.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* key features */}
-            <FormField
-              control={form.control}
-              name="keyFeatures"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Key Features <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-20"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter key features (comma-separated)"
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        form.setValue(
-                          "keyFeatures",
-                          value.split(",").map((item) => item.trim())
-                        );
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex flex-col xl:flex-row gap-5">
-              {/* live link */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="liveLink"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Live Link <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter live project link"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* frontend source code */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="frontendSourceCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Frontend Source Code{" "}
-                        <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter frontend source code URL"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col xl:flex-row gap-5">
-              {/* backend source code */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="backendSourceCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Backend Source Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter backend source code URL"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* api documentation */}
-              <div className="flex-1">
-                <FormField
-                  control={form.control}
-                  name="apiDocumentation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>API Documentation</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Enter API documentation URL"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* project goals */}
-            <FormField
-              control={form.control}
-              name="projectGoals"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Goals</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter project goals"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* challenge faced  */}
-            <FormField
-              control={form.control}
-              name="challengesFaced"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Challenges Faced</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter project challenges faced"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* solutions */}
-            <FormField
-              control={form.control}
-              name="solution"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Solution</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter solution"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* future improvements */}
-            <FormField
-              control={form.control}
-              name="futureImprovements"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Future Improvements</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter future improvements"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* security considerations */}
-            <FormField
-              control={form.control}
-              name="securityConsiderations"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Security Considerations</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="min-h-52"
-                      {...field}
-                      value={field.value || ""}
-                      placeholder="Enter security considerations"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* featured */}
-            <FormField
-              control={form.control}
-              name="isFeatured"
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={field.value || false}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                    onBlur={field.onBlur}
-                    ref={field.ref}
-                    className="h-4 w-4 accent-[#8750F7]"
-                  />
-                  <FormLabel className="text-sm">Featured Project</FormLabel>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* submit button */}
-            <Button
-              type="submit"
-              className="w-full bg-[#8750F7] hover:bg-[#733DD6] text-white cursor-pointer"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Saving" : "Update Project"}
-            </Button>
-          </div>
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Updating..." : "Update Project"}
+          </Button>
         </form>
       </Form>
     </Fragment>
