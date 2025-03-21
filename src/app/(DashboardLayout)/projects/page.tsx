@@ -1,6 +1,6 @@
 // import { getAllProjects } from "@/app/services/Project";
 // import ManageProject from "@/components/modules/Projects";
-
+export const dynamic = "force-dynamic";
 import ManageProject from "@/components/modules/Projects";
 import { getAllProjects } from "@/service/Project";
 

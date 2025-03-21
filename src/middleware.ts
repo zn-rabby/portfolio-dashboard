@@ -14,7 +14,7 @@ export const middleware = async (request: NextRequest) => {
         } else {
             return NextResponse.redirect(
                 // new URL(`http://localhost:3000/login`, request.url)
-                new URL(`http://localhost:3000/login`, request.url)
+                new URL(`https://portfolio-dashboard-delta-ten.vercel.app/login`, request.url)
             )
         }
     }
