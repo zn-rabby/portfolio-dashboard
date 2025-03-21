@@ -90,6 +90,7 @@ export default function UpdateProjectForm({ project }: { project: TProject }) {
       }
     } catch (error) {
       toast.error("Something went wrong!");
+      console.log(error)
     }
   };
 

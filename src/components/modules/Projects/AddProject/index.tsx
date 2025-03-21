@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
@@ -19,7 +18,7 @@ import { TProject } from "@/types/user";
 
 export default function AddProjectForm() {
   const router = useRouter();
-  const [imageLinks, setImageLinks] = useState<string[]>([]);
+  // const [setImageLinks] = useState<string[]>([]);
   
   const form = useForm<TProject>({
     defaultValues: {
@@ -49,7 +48,7 @@ export default function AddProjectForm() {
 
   const handleImageLinksChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const links = e.target.value.split(",").map((link) => link.trim());
-    setImageLinks(links);
+    // setImageLinks(links);
     form.setValue("image", links);
   };
 
@@ -67,8 +66,9 @@ export default function AddProjectForm() {
       } else {
         toast.error(response?.error?.[0]?.message || "Error adding project");
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error("Something went wrong!");
+      console.log(error)
     }
   };
 
@@ -139,7 +139,7 @@ export default function AddProjectForm() {
         )} />
 
         {/* Key Features */}
-        <FormField control={form.control} name="keyFeatures" render={({ field }) => (
+        <FormField control={form.control} name="keyFeatures" render={({  }) => (
           <FormItem>
             <FormLabel>Key Features <span className="text-red-500">*</span></FormLabel>
             <FormControl>
