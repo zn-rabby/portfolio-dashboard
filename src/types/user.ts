@@ -6,3 +6,10 @@ export interface IUser {
     role: 'admin' | 'user';
     isBlocked: boolean;
   }
+
+  export interface Contact {
+    _id: string;
+    email: string;
+    name: string;
+    message: string;
+  }

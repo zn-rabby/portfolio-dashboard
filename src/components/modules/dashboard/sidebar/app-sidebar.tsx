@@ -6,7 +6,6 @@ import {
   Map,
   PieChart,
   Settings,
-  Home,
   User,
   ShoppingCart,
   BarChart,
@@ -29,15 +28,10 @@ import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 const data = {
   navMain: [
+    
     {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: Home, // Changed to Home icon
-      isActive: true,
-    },
-    {
-      title: "Profile",
-      url: "/dashboard/profile",
+      title: "Contact SMS",
+      url: "/message",
       icon: User, // Changed to User icon
       isActive: true,
     },
