@@ -58,7 +58,7 @@ export default function DashboardLoginPage() {
         </p>
         <div className="mt-8">
           <img
-            src="/dashboard-illustration.png" // Replace with your modern illustration
+            src="https://res.cloudinary.com/daxjf1buu/image/upload/v1742519123/pp-removebg-preview_kbtwjl.png" // Replace with your modern illustration
             alt="Dashboard Illustration"
             className="w-96"
           />
