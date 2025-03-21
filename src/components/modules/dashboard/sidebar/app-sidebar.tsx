@@ -36,14 +36,14 @@ const data = {
       isActive: true,
     },
     {
-      title: "Track Purchases",
-      url: "/dashboard/purchase-history",
+      title: "Create Project",
+    url: "/projects/create-project",
       icon: ShoppingCart, // Changed to ShoppingCart icon
       isActive: true,
     },
     {
-      title: "Track Sales",
-      url: "/dashboard/sales-history",
+      title: "Projects",
+      url: "/projects",
       icon: BarChart, // Changed to BarChart icon
       isActive: true,
     },

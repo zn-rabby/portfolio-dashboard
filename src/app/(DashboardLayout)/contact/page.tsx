@@ -26,7 +26,6 @@ import { Contact } from "@/types/user";
 export default async function ContactPage() {
   // Fetch data on the server
   const data = await getAllContacts();
-  console.log("Data in ContactPage:", data); // Log the data to verify its structure
 
   // Access the `data` key from the API response
   const contacts: Contact[] = data.data || [];
