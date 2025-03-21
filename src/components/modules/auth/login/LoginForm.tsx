@@ -51,9 +51,9 @@ export default function LoginForm() {
     <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-8">
       {/* Logo and Heading */}
       <div className="flex flex-col items-center mb-8">
-        RRR
-        <h1 className="text-3xl font-bold text-gray-800 mt-4">Welcome Back!</h1>
-        <p className="text-gray-600">Login to your ReCycleMart account</p>
+        Rabby
+        <h1 className="text-3xl font-bold text-gray-800 mt-4">Welcome to my portfoli</h1>
+        <p className="text-gray-600">Login to my portfolio</p>
       </div>
 
       {/* Login Form */}
