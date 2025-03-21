@@ -27,7 +27,7 @@ export const getAllContacts = async (page?: string, limit?: string) => {
         }
       );
       const data = await res.json();
-      console.log("Fetched Data:", data); // Log the data to verify its structure
+    //   console.log("Fetched Data:", data); // Log the data to verify its structure
       return data;
     } catch (error: any) {
       throw new Error(error.message); // Throw error instead of returning it

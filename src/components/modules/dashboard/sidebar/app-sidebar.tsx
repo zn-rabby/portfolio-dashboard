@@ -31,7 +31,7 @@ const data = {
     
     {
       title: "Contact SMS",
-      url: "/message",
+      url: "/contact",
       icon: User, // Changed to User icon
       isActive: true,
     },
