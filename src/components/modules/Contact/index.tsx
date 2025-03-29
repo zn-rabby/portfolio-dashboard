@@ -13,15 +13,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, MoreHorizontal, Trash2 } from "lucide-react";
+import { ChevronDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -46,6 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Card } from "@/components/ui/card";
 
 export default function ManageMessages({ message }: { message: IContact[] }) {
   const [data, setData] = React.useState<IContact[]>(message);
@@ -101,7 +100,7 @@ export default function ManageMessages({ message }: { message: IContact[] }) {
       cell: ({ row }) => (
         <a
           href={`mailto:${row.getValue("email")}`}
-          className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+          className="text-sm text-blue-600 hover:underline dark:text-blue-400 transition-colors"
         >
           {row.getValue("email")}
         </a>
@@ -118,42 +117,21 @@ export default function ManageMessages({ message }: { message: IContact[] }) {
     },
     {
       id: "actions",
+      header: "Actions", // Added header for actions column
       enableHiding: false,
       cell: ({ row }) => {
         const contact = row.original;
 
         return (
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-8 w-8 p-0"
-                  disabled={isDeleting}
-                >
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="dark:bg-gray-800 dark:border-gray-700 w-48"
-              >
-                <DropdownMenuLabel className="dark:text-gray-200">
-                  Actions
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="dark:bg-gray-700" />
-
-                <DropdownMenuItem
-                  onClick={() => confirmDelete(contact._id)}
-                  className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:hover:bg-gray-700"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span className="dark:text-red-400">Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => confirmDelete(contact._id)}
+            className="h-8 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-gray-700 dark:text-red-400"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
         );
       },
     },
@@ -172,7 +150,7 @@ export default function ManageMessages({ message }: { message: IContact[] }) {
     onRowSelectionChange: setRowSelection,
     initialState: {
       pagination: {
-        pageSize: 8, // Set default page size to 8
+        pageSize: 8,
       },
     },
     state: {
@@ -184,17 +162,199 @@ export default function ManageMessages({ message }: { message: IContact[] }) {
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
+      {/* Header and Filters */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <Input
+          placeholder="Filter messages..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+        />
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                >
+                  Columns <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="dark:bg-gray-800 dark:border-gray-700"
+              >
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize dark:hover:bg-gray-700"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      <span className="dark:text-gray-200">{column.id}</span>
+                    </DropdownMenuCheckboxItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                >
+                  {table.getState().pagination.pageSize} per page{" "}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="dark:bg-gray-800 dark:border-gray-700"
+              >
+                {[8, 16, 24, 32].map((size) => (
+                  <DropdownMenuItem
+                    key={size}
+                    className="dark:hover:bg-gray-700"
+                    onClick={() => table.setPageSize(size)}
+                  >
+                    <span className="dark:text-gray-200">{size} per page</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
+
+      {/* Table Card */}
+      <Card className="border dark:border-gray-700 overflow-hidden">
+        <Table>
+          <TableHeader className="bg-gray-50 dark:bg-gray-800">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="dark:border-gray-700">
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="dark:text-gray-200 py-3 px-4"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="dark:text-gray-300 py-3 px-4"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center dark:text-gray-300 py-6"
+                >
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <p>No messages found</p>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        table.resetColumnFilters();
+                        table.resetSorting();
+                      }}
+                      className="text-blue-600 dark:text-blue-400"
+                    >
+                      Clear filters
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+
+      {/* Pagination */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-sm text-muted-foreground dark:text-gray-400">
+          Showing{" "}
+          <span className="font-medium">
+            {table.getState().pagination.pageIndex *
+              table.getState().pagination.pageSize +
+              1}
+            -
+            {Math.min(
+              (table.getState().pagination.pageIndex + 1) *
+                table.getState().pagination.pageSize,
+              data.length
+            )}
+          </span>{" "}
+          of <span className="font-medium">{data.length}</span> messages
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          >
+            Previous
+          </Button>
+          <div className="flex items-center justify-center w-10 h-9 text-sm font-medium border rounded-md dark:border-gray-700">
+            {table.getState().pagination.pageIndex + 1}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="dark:bg-gray-800 dark:border-gray-700">
+        <AlertDialogContent className="dark:bg-gray-800 dark:border-gray-700 max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="dark:text-white">
-              Are you sure?
+              Delete Message
             </AlertDialogTitle>
             <AlertDialogDescription className="dark:text-gray-300">
-              This action cannot be undone. This will permanently delete the
-              message.
+              This will permanently delete this message. This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -213,169 +373,6 @@ export default function ManageMessages({ message }: { message: IContact[] }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Table Controls */}
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter messages..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        />
-        <div className="ml-auto flex space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-              >
-                Columns <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="dark:bg-gray-800 dark:border-gray-700"
-            >
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize dark:hover:bg-gray-700"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    <span className="dark:text-gray-200">{column.id}</span>
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-              >
-                {table.getState().pagination.pageSize} per page{" "}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="dark:bg-gray-800 dark:border-gray-700"
-            >
-              {[8, 16, 24, 32].map((size) => (
-                <DropdownMenuItem
-                  key={size}
-                  className="dark:hover:bg-gray-700"
-                  onClick={() => table.setPageSize(size)}
-                >
-                  <span className="dark:text-gray-200">{size} per page</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="rounded-md border dark:border-gray-700">
-        <Table>
-          <TableHeader className="dark:bg-gray-800">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="dark:border-gray-700">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="dark:text-gray-200">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="dark:border-gray-700 dark:hover:bg-gray-800/50"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="dark:text-gray-300">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center dark:text-gray-300"
-                >
-                  No messages found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-between py-4">
-        <div className="text-sm text-muted-foreground dark:text-gray-400">
-          Showing{" "}
-          {table.getState().pagination.pageIndex *
-            table.getState().pagination.pageSize +
-            1}
-          -
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) *
-              table.getState().pagination.pageSize,
-            data.length
-          )}{" "}
-          of {data.length} messages
-        </div>
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-muted-foreground dark:text-gray-400">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
