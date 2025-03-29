@@ -1,12 +1,13 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Mail,
   FileText,
   Folder,
-  User,
   Clock,
   Calendar,
   Cloud,
@@ -122,7 +123,6 @@ export default function ProfessionalPortfolioDashboard() {
               <Cloud className="h-5 w-5 text-gray-400" />
               <span className="text-gray-600">{weather.condition}</span>
             </div>
-
             {/* Real-time Date */}
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-[#39CCB5]" />
@@ -134,7 +134,6 @@ export default function ProfessionalPortfolioDashboard() {
                 })}
               </span>
             </div>
-
             {/* Real-time Clock */}
             <div className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-[#39CCB5]" />
@@ -149,10 +148,21 @@ export default function ProfessionalPortfolioDashboard() {
 
             <Button
               variant="outline"
-              className="border-[#39CCB5] text-[#39CCB5] hover:bg-[#39CCB5]/10"
+              className="border-[#39CCB5] text-[#39CCB5] hover:bg-[#39CCB5]/10 flex items-center gap-2 pl-2 pr-4"
             >
-              <User className="mr-2 h-4 w-4" />
-              Profile
+              <div className="flex items-center">
+                <Avatar className="h-8 w-8 border border-[#39CCB5]/30">
+                  <AvatarImage
+                    src="/path-to-your-image.jpg"
+                    alt="Zulkar Naeem Rabby"
+                  />
+                  <AvatarFallback className="bg-[#39CCB5] text-white">
+                    ZNR
+                  </AvatarFallback>
+                </Avatar>
+                {/* <User className="ml-2 h-4 w-4" /> */}
+              </div>
+              <span>Zulkar Naeem Rabby</span>
             </Button>
           </div>
         </div>
