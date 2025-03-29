@@ -1,9 +1,9 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getAllContacts } from "@/service/Contacts";
 import {
   Mail,
   FileText,
@@ -24,9 +24,42 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 
-// Sample data for charts
+// Define types
+type MessageData = {
+  name: string;
+  value: number;
+  fullDate: string;
+};
+
+type RecentMessage = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  date: string;
+  time: string;
+};
+
+type Weather = {
+  temp: number;
+  condition: string;
+};
+
+type Contact = {
+  _id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+};
+
+// Custom color palette
+const COLORS = ["#39CCB5", "#4FD1C5", "#63E3D7", "#81E6D9", "#A7F3D0"];
+
+// Sample data for projects chart
 const projectData = [
   { name: "Jan", value: 400 },
   { name: "Feb", value: 300 },
@@ -36,17 +69,6 @@ const projectData = [
   { name: "Jun", value: 900 },
 ];
 
-const messageData = [
-  { name: "Mon", value: 20 },
-  { name: "Tue", value: 35 },
-  { name: "Wed", value: 25 },
-  { name: "Thu", value: 45 },
-  { name: "Fri", value: 30 },
-  { name: "Sat", value: 15 },
-  { name: "Sun", value: 10 },
-];
-
-// Custom Progress component to handle indicator color
 function CustomProgress({
   value,
   className = "",
@@ -67,41 +89,133 @@ function CustomProgress({
 }
 
 export default function ProfessionalPortfolioDashboard() {
-  // State for real-time data
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [weather, setWeather] = useState({ temp: 28, condition: "Sunny" });
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [weather, setWeather] = useState<Weather>({
+    temp: 28,
+    condition: "Sunny",
+  });
+  const [messageCount, setMessageCount] = useState<number>(0);
+  const [messageData, setMessageData] = useState<MessageData[]>([]);
+  const [recentMessages, setRecentMessages] = useState<RecentMessage[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Sample data
-  const stats = {
-    projects: 24,
-    blogs: 15,
-    messages: 42,
-    completionRate: 78,
-  };
-
-  const recentMessages = [
-    {
-      id: 1,
-      name: "John Doe",
-      message: "Interested in collaboration",
-      time: "2h ago",
-    },
-    { id: 2, name: "Jane Smith", message: "Project inquiry", time: "1d ago" },
-    { id: 3, name: "Acme Inc", message: "Job opportunity", time: "3d ago" },
-  ];
-
-  // Update time every second
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllContacts();
+        if (response && response.data) {
+          // Set total message count
+          setMessageCount(response.data.length);
+
+          // Process message data by date
+          const messagesByDate = processMessagesByDate(response.data);
+          setMessageData(messagesByDate);
+
+          // Get 3 most recent messages
+          const sortedMessages = [...response.data]
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
+            .slice(0, 3);
+
+          setRecentMessages(
+            sortedMessages.map((msg) => ({
+              id: msg._id,
+              name: msg.name,
+              email: msg.email,
+              message: msg.message,
+              date: formatDate(new Date(msg.createdAt)),
+              time: formatTimeAgo(new Date(msg.createdAt)),
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    // Update time and weather every minute
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-      // Simulate weather changes (in a real app, you'd fetch this from an API)
       setWeather({
         temp: Math.floor(25 + Math.random() * 10),
         condition: ["Sunny", "Cloudy", "Rainy"][Math.floor(Math.random() * 3)],
       });
-    }, 1000);
+    }, 60000);
+
     return () => clearInterval(timer);
   }, []);
+
+  // Process messages to group by date
+  function processMessagesByDate(messages: Contact[]): MessageData[] {
+    const dateMap: Record<string, number> = {};
+
+    messages.forEach((msg) => {
+      const date = new Date(msg.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+
+      dateMap[date] = (dateMap[date] || 0) + 1;
+    });
+
+    return Object.entries(dateMap)
+      .map(([name, value]) => ({
+        name,
+        value,
+        fullDate: new Date(name).toISOString(),
+      }))
+      .sort(
+        (a, b) =>
+          new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime()
+      );
+  }
+
+  // Format date as "MMM DD, YYYY"
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  // Format time ago
+  function formatTimeAgo(date: Date): string {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return interval === 1
+          ? `${interval} ${unit} ago`
+          : `${interval} ${unit}s ago`;
+      }
+    }
+    return "Just now";
+  }
+
+  const stats = {
+    projects: 24,
+    blogs: 15,
+    messages: messageCount,
+    completionRate: 78,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -116,14 +230,15 @@ export default function ProfessionalPortfolioDashboard() {
           </div>
 
           <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-            {/* Real-time Weather */}
+            {/* Weather */}
             <div className="flex items-center space-x-2">
               <Thermometer className="h-5 w-5 text-[#39CCB5]" />
               <span className="font-medium">{weather.temp}°C</span>
               <Cloud className="h-5 w-5 text-gray-400" />
               <span className="text-gray-600">{weather.condition}</span>
             </div>
-            {/* Real-time Date */}
+
+            {/* Date */}
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-[#39CCB5]" />
               <span className="font-medium">
@@ -134,34 +249,32 @@ export default function ProfessionalPortfolioDashboard() {
                 })}
               </span>
             </div>
-            {/* Real-time Clock */}
+
+            {/* Time */}
             <div className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-[#39CCB5]" />
               <span className="font-medium">
                 {currentTime.toLocaleTimeString("en-US", {
                   hour: "2-digit",
                   minute: "2-digit",
-                  second: "2-digit",
                 })}
               </span>
             </div>
 
+            {/* User Profile */}
             <Button
               variant="outline"
               className="border-[#39CCB5] text-[#39CCB5] hover:bg-[#39CCB5]/10 flex items-center gap-2 pl-2 pr-4"
             >
-              <div className="flex items-center">
-                <Avatar className="h-8 w-8 border border-[#39CCB5]/30">
-                  <AvatarImage
-                    src="/path-to-your-image.jpg"
-                    alt="Zulkar Naeem Rabby"
-                  />
-                  <AvatarFallback className="bg-[#39CCB5] text-white">
-                    ZNR
-                  </AvatarFallback>
-                </Avatar>
-                {/* <User className="ml-2 h-4 w-4" /> */}
-              </div>
+              <Avatar className="h-8 w-8 border border-[#39CCB5]/30">
+                <AvatarImage
+                  src="/path-to-your-image.jpg"
+                  alt="Zulkar Naeem Rabby"
+                />
+                <AvatarFallback className="bg-[#39CCB5] text-white">
+                  ZNR
+                </AvatarFallback>
+              </Avatar>
               <span>Zulkar Naeem Rabby</span>
             </Button>
           </div>
@@ -172,6 +285,7 @@ export default function ProfessionalPortfolioDashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Projects Card */}
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
@@ -185,16 +299,27 @@ export default function ProfessionalPortfolioDashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={projectData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" stroke="#888" />
-                    <YAxis stroke="#888" />
-                    <Tooltip />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#fff",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                        border: "none",
+                      }}
+                    />
                     <Line
                       type="monotone"
                       dataKey="value"
                       stroke="#39CCB5"
                       strokeWidth={2}
                       dot={{ fill: "#39CCB5", r: 4 }}
-                      activeDot={{ r: 6 }}
+                      activeDot={{ r: 6, stroke: "#39CCB5", strokeWidth: 2 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -202,6 +327,7 @@ export default function ProfessionalPortfolioDashboard() {
             </CardContent>
           </Card>
 
+          {/* Blogs Card */}
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
@@ -215,6 +341,7 @@ export default function ProfessionalPortfolioDashboard() {
             </CardContent>
           </Card>
 
+          {/* Messages Card */}
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
@@ -223,24 +350,65 @@ export default function ProfessionalPortfolioDashboard() {
               <Mail className="h-5 w-5 text-[#39CCB5]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.messages}</div>
+              <div className="text-2xl font-bold">{messageCount}</div>
               <div className="h-[200px] mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={messageData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" stroke="#888" />
-                    <YAxis stroke="#888" />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#39CCB5" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {loading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#39CCB5]"></div>
+                  </div>
+                ) : messageData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={messageData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#888"
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis stroke="#888" tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "#fff",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                          border: "none",
+                        }}
+                        formatter={(value: number) => [
+                          `${value} messages`,
+                          "Count",
+                        ]}
+                        labelFormatter={(label: string) => `Date: ${label}`}
+                      />
+                      <Bar
+                        dataKey="value"
+                        name="Messages"
+                        radius={[4, 4, 0, 0]}
+                      >
+                        {messageData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No message data available
+                  </div>
+                )}
               </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Total messages received: {messageCount}
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Progress Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Profile Completion */}
           <Card>
             <CardHeader>
               <CardTitle>Profile Completion</CardTitle>
@@ -270,28 +438,52 @@ export default function ProfessionalPortfolioDashboard() {
             </CardContent>
           </Card>
 
+          {/* Recent Messages */}
           <Card>
             <CardHeader>
               <CardTitle>Recent Messages</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className="flex items-start pb-4 last:pb-0 border-b last:border-b-0"
-                  >
-                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#39CCB5]/10 flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-[#39CCB5]" />
+              {loading ? (
+                <div className="flex items-center justify-center h-40">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#39CCB5]"></div>
+                </div>
+              ) : recentMessages.length > 0 ? (
+                <div className="space-y-4">
+                  {recentMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className="flex items-start pb-4 last:pb-0 border-b last:border-b-0"
+                    >
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#39CCB5]/10 flex items-center justify-center">
+                        <Mail className="h-5 w-5 text-[#39CCB5]" />
+                      </div>
+                      <div className="ml-4">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium">{msg.name}</h3>
+                          <div className="text-xs text-gray-400">
+                            {msg.date}
+                          </div>
+                        </div>
+                        <a
+                          href={`mailto:${msg.email}`}
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          {msg.email}
+                        </a>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {msg.message}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">{msg.time}</p>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <h3 className="font-medium">{msg.name}</h3>
-                      <p className="text-sm text-gray-600">{msg.message}</p>
-                      <p className="text-xs text-gray-400 mt-1">{msg.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-40 text-gray-500">
+                  No recent messages
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
