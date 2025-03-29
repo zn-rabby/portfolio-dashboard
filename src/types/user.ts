@@ -33,3 +33,10 @@ export interface TProject {
   // Additional Info (Optional)
   projectGoals?: string;
 }
+
+export interface IMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
