@@ -67,9 +67,9 @@ export default function DashboardLayout({
           </header>
 
           {/* Main Content */}
-          <main className="relative w-full overflow-y-auto px-4 py-6 md:px-6">
+          <main className="relative w-full overflow-y-auto px-2 py-3 md:px-3">
             <div className="mx-auto w-full max-w-[1800px]">
-              <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+              <div className="rounded border border-gray-100 bg-white  dark:border-gray-800 dark:bg-gray-950 p-3">
                 {children}
               </div>
             </div>
