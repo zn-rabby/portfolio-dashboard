@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { addProject } from "@/service/Project";
 import { IProject } from "@/types/user";
+import RichTextEditor from "@/components/ui/core/RichTextEditor";
 
 export default function AddProjectForm() {
   const router = useRouter();
@@ -65,19 +66,14 @@ export default function AddProjectForm() {
     "Material-UI",
     "Ant Design",
     "Shadcn/UI",
-    "Chakra UI",
-    "Styled Components",
 
     // ===== Backend Technologies =====
     "Node.js",
     "Express.js",
-    "NestJS",
-    "Fastify",
 
     // ===== Authentication =====
     "JWT",
     "OAuth",
-    "Passport.js",
     "Firebase Auth",
 
     // ===== Database =====
@@ -89,9 +85,7 @@ export default function AddProjectForm() {
     // SQL
     "PostgreSQL",
     "MySQL",
-    "SQLite",
     "Prisma",
-    "TypeORM",
 
     // ===== DevOps & Cloud =====
     "AWS",
@@ -107,16 +101,11 @@ export default function AddProjectForm() {
     // ===== Testing =====
     "Jest",
     "React Testing Library",
-    "Cypress",
-    "Mocha",
-    "Chai",
 
     // ===== Other Tools =====
     "GraphQL",
-    "Apollo",
     "REST API",
     "WebSockets",
-    "Webpack",
     "Vite",
     "ESLint",
     "Prettier",
@@ -188,7 +177,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Category */}
         <FormField
           control={form.control}
@@ -205,8 +193,9 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Description */}
+
+        {/* // Replace the existing Description FormField with: */}
         <FormField
           control={form.control}
           name="description"
@@ -216,18 +205,15 @@ export default function AddProjectForm() {
                 Description <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Textarea
-                  {...field}
-                  className="min-h-52"
-                  placeholder="Enter project description"
-                  required
+                <RichTextEditor
+                  value={field.value}
+                  onChange={(value: any) => field.onChange(value)}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
         {/* Image Links */}
         <FormField
           control={form.control}
@@ -245,7 +231,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Technologies Used */}
         <FormField
           control={form.control}
@@ -280,7 +265,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Features */}
         <FormField
           control={form.control}
@@ -321,7 +305,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Live Demo Link */}
         <FormField
           control={form.control}
@@ -336,7 +319,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Repository Link (Client) */}
         <FormField
           control={form.control}
@@ -351,7 +333,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Repository Link (Server) */}
         <FormField
           control={form.control}
@@ -367,25 +348,24 @@ export default function AddProjectForm() {
           )}
         />
 
-        {/* Project Goals */}
         <FormField
           control={form.control}
           name="projectGoals"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project Goals</FormLabel>
+              <FormLabel>
+                Project Goals <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Enter project goals"
-                  className="min-h-36"
+                <RichTextEditor
+                  value={field.value}
+                  onChange={(value: any) => field.onChange(value)}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
         {/* Is Published */}
         <FormField
           control={form.control}
@@ -404,7 +384,6 @@ export default function AddProjectForm() {
             </FormItem>
           )}
         />
-
         {/* Submit Button */}
         <Button
           type="submit"
