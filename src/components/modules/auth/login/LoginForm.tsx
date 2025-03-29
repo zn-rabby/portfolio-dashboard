@@ -285,7 +285,7 @@ export default function DashboardLoginPage() {
         <div className="mt-8 text-center">
           <div className="flex justify-center space-x-6 mb-4">
             <motion.a
-              href="https://github.com/yourusername"
+              href="https://github.com/zn-rabby"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ y: -2 }}
@@ -302,7 +302,7 @@ export default function DashboardLoginPage() {
             </motion.a>
 
             <motion.a
-              href="https://linkedin.com/in/yourusername"
+              href="https://www.linkedin.com/in/zn-rabby/"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ y: -2 }}
@@ -315,20 +315,7 @@ export default function DashboardLoginPage() {
             </motion.a>
 
             <motion.a
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ y: -2 }}
-              className="text-gray-400 hover:text-[#3CD1B8] transition-colors"
-            >
-              <span className="sr-only">Twitter</span>
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-              </svg>
-            </motion.a>
-
-            <motion.a
-              href="mailto:your.email@example.com"
+              href="mailto:zn.rabby@gmail.com"
               whileHover={{ y: -2 }}
               className="text-gray-400 hover:text-[#3CD1B8] transition-colors"
             >
@@ -339,6 +326,37 @@ export default function DashboardLoginPage() {
             </motion.a>
           </div>
 
+          {/* Portfolio Live Link Section */}
+          <motion.div
+            className="mb-8 p-6 bg-gray-800/50 rounded-xl border border-[#3CD1B8]/30 backdrop-blur-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.a
+              href="https://zn-rabby.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              className="inline-flex items-center px-4 py-3 bg-gradient-to-r from-[#3CD1B8] to-[#2DA897] text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                />
+              </svg>
+              Visit My Portfolio
+            </motion.a>
+          </motion.div>
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Zulkar Naeem Rabby. All rights
             reserved.
