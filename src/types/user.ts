@@ -14,24 +14,20 @@ export interface IContact {
   message: string;
 }
 
-export interface TProject {
-  _id: string;
-  name: string;
-  category: string;
+export interface IProject {
+  slug: string;
   title: string;
+  category: string;
   description: string;
   image: string[];
   technologies: string[];
-  keyFeatures: string[];
+  features?: string[];
+  projectGoals?: string;
   status: "ongoing" | "completed" | "maintenance";
-
-  // Links
   liveDemoLink: string;
   repoLinkClient?: string;
   repoLinkServer?: string;
-
-  // Additional Info (Optional)
-  projectGoals?: string;
+  isPublished?: boolean;
 }
 
 export interface IMeta {

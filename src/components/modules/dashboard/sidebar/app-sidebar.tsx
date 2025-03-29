@@ -39,7 +39,7 @@ const navItems = [
   },
   {
     title: "Create Project",
-    url: "/projects/create",
+    url: "/projects/create-project",
     icon: PlusCircle,
     isActive: false,
   },
