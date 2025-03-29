@@ -1,10 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
-
-
 
 export const loginUser = async (userData: FieldValues) => {
   try {
@@ -43,5 +42,3 @@ export const getCurrentUser = async () => {
 export const logout = async () => {
   (await cookies()).delete("accessToken");
 };
-
-
