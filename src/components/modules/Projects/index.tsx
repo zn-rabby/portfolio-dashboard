@@ -37,10 +37,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { TProject } from "@/types/user";
 import { deleteProjectById } from "@/service/Project";
+import { IProject } from "@/types/user";
 
-export default function ManageProject({ projects }: { projects: TProject[] }) {
+export default function ManageProject({ projects }: { projects: IProject[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -63,46 +63,42 @@ export default function ManageProject({ projects }: { projects: TProject[] }) {
     }
   };
 
-  const columns: ColumnDef<TProject>[] = [
+  const columns: ColumnDef<IProject>[] = [
     {
-        accessorKey: "thumbnail",
-        header: "Thumbnail Image",
-        cell: ({ row }) => {
-          // Get the image array from the row
-          const images = row.original.image as string[]; // Assuming 'image' is the array field
-      
-          // Use the first image in the array as the thumbnail
-          const thumbnail = images?.[0] || ""; // Fallback to an empty string if the array is empty
-      
-          // Check if the thumbnail is a valid URL
-          const isValidUrl = (url: string) => {
-            try {
-              new URL(url); // This will throw an error if the URL is invalid
-              return true;
-            } catch {
-              return false;
-            }
-          };
-      
-          return (
-            <div className="w-[50px] h-[50px] overflow-hidden rounded-lg">
-              {thumbnail && isValidUrl(thumbnail) ? (
-                <Image
-                  src={thumbnail}
-                  width={50}
-                  height={50}
-                  alt="Thumbnail Image"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                  No Image
-                </div>
-              )}
-            </div>
-          );
-        },
+      accessorKey: "thumbnail",
+      header: "Thumbnail Image",
+      cell: ({ row }) => {
+        const images = row.original.image as string[];
+        const thumbnail = images?.[0] || "";
+
+        const isValidUrl = (url: string) => {
+          try {
+            new URL(url);
+            return true;
+          } catch {
+            return false;
+          }
+        };
+
+        return (
+          <div className="w-[50px] h-[50px] overflow-hidden rounded-lg">
+            {thumbnail && isValidUrl(thumbnail) ? (
+              <Image
+                src={thumbnail}
+                width={50}
+                height={50}
+                alt="Thumbnail Image"
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                No Image
+              </div>
+            )}
+          </div>
+        );
       },
+    },
     {
       accessorKey: "title",
       header: "Title",
@@ -155,19 +151,23 @@ export default function ManageProject({ projects }: { projects: TProject[] }) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-8 w-8 p-0 hover:bg-gray-100"
-              >
+              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-gray-100">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border border-gray-200">
-              <DropdownMenuLabel className="text-gray-800">Actions</DropdownMenuLabel>
+            <DropdownMenuContent
+              align="end"
+              className="bg-white border border-gray-200"
+            >
+              <DropdownMenuLabel className="text-gray-800">
+                Actions
+              </DropdownMenuLabel>
 
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(project.liveDemoLink)}
+                onClick={() =>
+                  navigator.clipboard.writeText(project.liveDemoLink)
+                }
                 className="text-gray-700 hover:bg-gray-100"
               >
                 <FaCopy className="mr-2 text-blue-500" />
@@ -250,7 +250,10 @@ export default function ManageProject({ projects }: { projects: TProject[] }) {
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white border border-gray-200">
+          <DropdownMenuContent
+            align="end"
+            className="bg-white border border-gray-200"
+          >
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())

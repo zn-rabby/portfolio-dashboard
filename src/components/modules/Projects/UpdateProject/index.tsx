@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,8 +14,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Fragment, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { updateProjectById } from "@/service/Project";
+import { IProject } from "@/types/user";
+import RichTextEditor from "@/components/ui/core/RichTextEditor";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -19,48 +26,66 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { TProject } from "@/types/user";
-import { updateProjectById } from "@/service/Project";
+import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
 
-export default function UpdateProjectForm({ project }: { project: TProject }) {
+export default function UpdateProjectForm({ project }: { project: IProject }) {
   const router = useRouter();
-  const [imageLinks, setImageLinks] = useState<string[]>(project?.image || []);
 
   const technologies = [
-    "javascript",
-    "typescript",
-    "mongodb",
-    "mongoose",
-    "tailwindCss",
-    "shadcnUi",
-    "antDesign",
-    "materialUi",
-    "jwt",
-    "other",
+    // ===== Core Web Technologies =====
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "TypeScript",
+
+    // ===== Frontend Technologies =====
+    "React",
+    "Next.js",
+    "Angular",
+    "Vue",
+    "Svelte",
+    "Redux",
+    "Tailwind CSS",
+    "Bootstrap",
+    "Material-UI",
+    "Ant Design",
+    "Shadcn/UI",
+
+    // ===== Backend Technologies =====
+    "Node.js",
+    "Express.js",
+    "NestJS",
+
+    // ===== Database =====
+    "MongoDB",
+    "Mongoose",
+    "PostgreSQL",
+    "MySQL",
+    "Prisma",
+
+    // ===== Other =====
+    "GraphQL",
+    "REST API",
+    "JWT",
+    "OAuth",
+    "Docker",
+    "AWS",
+    "Firebase",
   ];
 
   const statusOptions = [
     { value: "ongoing", label: "Ongoing" },
     { value: "completed", label: "Completed" },
-    { value: "onHold", label: "On Hold" },
+    { value: "maintenance", label: "Maintenance" },
   ];
 
-  const form = useForm({
+  const form = useForm<IProject>({
     defaultValues: {
-      name: project?.name || "",
-      category: project?.category || "",
-      title: project?.title || "",
-      description: project?.description || "",
-      image: project?.image || [],
-      technologies: project?.technologies || [],
-      keyFeatures: project?.keyFeatures || [],
-      status: project?.status || "ongoing",
-      liveDemoLink: project?.liveDemoLink || "",
-      repoLinkClient: project?.repoLinkClient || "",
-      repoLinkServer: project?.repoLinkServer || "",
-      projectGoals: project?.projectGoals || "",
+      ...project,
+      features: project.features || [],
+      technologies: project.technologies || [],
+      image: project.image || [],
     },
   });
 
@@ -70,16 +95,25 @@ export default function UpdateProjectForm({ project }: { project: TProject }) {
 
   const handleImageLinksChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const links = e.target.value.split(",").map((link) => link.trim());
-    setImageLinks(links);
     form.setValue("image", links);
   };
 
-  const handleKeyFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const features = e.target.value.split("\n").map((feature) => feature.trim());
-    form.setValue("keyFeatures", features);
+  const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const features = e.target.value
+      .split("\n")
+      .map((feature) => feature.trim());
+    form.setValue("features", features);
   };
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const handleTechnologiesChange = (tech: string) => {
+    const currentTechs = form.getValues("technologies") || [];
+    const updatedTechs = currentTechs.includes(tech)
+      ? currentTechs.filter((t) => t !== tech)
+      : [...currentTechs, tech];
+    form.setValue("technologies", updatedTechs);
+  };
+
+  const onSubmit: SubmitHandler<IProject> = async (data) => {
     try {
       const response = await updateProjectById(project?._id, data);
       if (response?.success) {
@@ -88,196 +122,283 @@ export default function UpdateProjectForm({ project }: { project: TProject }) {
       } else {
         toast.error(response?.error?.[0]?.message || "Error updating project");
       }
-    } catch (error:any) {
-      toast.error("Something went wrong!",error);
+    } catch (error: any) {
+      toast.error("Something went wrong!");
+      console.error(error);
     }
   };
 
   return (
-    <Fragment>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
-          <FormField control={form.control} name="name" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Project name" required />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-
-          {/* Category */}
-          <FormField control={form.control} name="category" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Project category" required />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-
-          {/* Title */}
-          <FormField control={form.control} name="title" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Project title" required />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-
-          {/* Image Links */}
-          <FormItem>
-            <FormLabel>Image Links (comma-separated)</FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Enter image links"
-                value={imageLinks.join(",")}
-                onChange={handleImageLinksChange}
+    <Card className="border-none shadow-none">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Update Project</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Title */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Title <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Project title"
+                        required
+                        className="bg-muted"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </FormControl>
-          </FormItem>
 
-          {/* Description */}
-          <FormField control={form.control} name="description" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  className="min-h-52"
-                  placeholder="Enter project description"
-                  required
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+              {/* Category */}
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Category <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Project category"
+                        required
+                        className="bg-muted"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          {/* Technologies Used */}
-          <FormField control={form.control} name="technologies" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Technologies Used <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <select
-                  multiple
-                  value={field.value}
-                  onChange={(e) => field.onChange([...e.target.selectedOptions].map((o) => o.value))}
-                  className="w-full min-h-36 border-2 border-gray-300"
-                  required
-                >
-                  {technologies.map((tech) => (
-                    <option key={tech} value={tech}>
-                      {tech}
-                    </option>
-                  ))}
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Description <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={(value: any) => field.onChange(value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Key Features */}
-          <FormField control={form.control} name="keyFeatures" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Key Features <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter key features (one per line)"
-                  value={field.value.join("\n")}
-                  onChange={handleKeyFeaturesChange}
-                  className="min-h-36"
-                  required
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            {/* Image Links */}
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image Links (comma-separated)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter image links separated by commas"
+                      value={field.value?.join(",") || ""}
+                      onChange={handleImageLinksChange}
+                      className="bg-muted"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Status */}
-          <FormField control={form.control} name="status" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select project status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            {/* Technologies Used */}
+            <FormField
+              control={form.control}
+              name="technologies"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Technologies Used <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex flex-wrap gap-2">
+                      {technologies.map((tech) => (
+                        <Badge
+                          key={tech}
+                          variant={
+                            field.value?.includes(tech) ? "default" : "outline"
+                          }
+                          className="cursor-pointer"
+                          onClick={() => handleTechnologiesChange(tech)}
+                        >
+                          {tech}
+                          {field.value?.includes(tech) && (
+                            <span className="ml-1">✓</span>
+                          )}
+                        </Badge>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Live Demo Link */}
-          <FormField control={form.control} name="liveDemoLink" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Live Demo Link</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter live demo link" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            {/* Features */}
+            <FormField
+              control={form.control}
+              name="features"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Features (one per line)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={`• Feature 1\n• Feature 2\n• Feature 3`}
+                      onChange={handleFeaturesChange}
+                      className="min-h-36 bg-muted"
+                      value={field.value?.join("\n") || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Repository Link (Client) */}
-          <FormField control={form.control} name="repoLinkClient" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Repository Link (Client)</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter client repository link" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Status */}
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-muted">
+                          <SelectValue placeholder="Select project status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {statusOptions.map((status) => (
+                          <SelectItem key={status.value} value={status.value}>
+                            {status.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          {/* Repository Link (Server) */}
-          <FormField control={form.control} name="repoLinkServer" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Repository Link (Server)</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter server repository link" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+              {/* Live Demo Link */}
+              <FormField
+                control={form.control}
+                name="liveDemoLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Live Demo Link</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="https://example.com"
+                        className="bg-muted"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          {/* Project Goals */}
-          <FormField control={form.control} name="projectGoals" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Project Goals</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Enter project goals"
-                  className="min-h-36"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
+            <Separator />
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Updating..." : "Update Project"}
-          </Button>
-        </form>
-      </Form>
-    </Fragment>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Repository Link (Client) */}
+              <FormField
+                control={form.control}
+                name="repoLinkClient"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Repository Link (Client)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="https://github.com/username/repo-client"
+                        className="bg-muted"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Repository Link (Server) */}
+              <FormField
+                control={form.control}
+                name="repoLinkServer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Repository Link (Server)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="https://github.com/username/repo-server"
+                        className="bg-muted"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Project Goals */}
+            <FormField
+              control={form.control}
+              name="projectGoals"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Goals</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={(value: any) => field.onChange(value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Submit Button */}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating Project...
+                </>
+              ) : (
+                "Update Project"
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
