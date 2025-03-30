@@ -69,7 +69,7 @@ export const updateBlogById = async (id: string, updatedBlogData: any) => {
   }
 };
 
-export const deleteProjectById = async (id: string) => {
+export const deleteBlogById = async (id: string) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/blogs/${id}`, {
       method: "DELETE",

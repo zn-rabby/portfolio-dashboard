@@ -37,7 +37,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { deleteBlogById } from "@/service/Blog"; // Changed to blog service
 import { IBlog } from "@/types/type";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -46,6 +45,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { deleteBlogById } from "@/service/Blog";
 
 export default function ManageBlogs({ blogs }: { blogs: IBlog[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);

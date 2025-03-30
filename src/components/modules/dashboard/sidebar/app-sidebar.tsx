@@ -59,7 +59,7 @@ const navItems = [
   },
   {
     title: "Create Blog",
-    url: "/projects/create-blog",
+    url: "/blogs/create-blog",
     icon: Edit, // More relevant for blog creation
     isActive: false,
   },
