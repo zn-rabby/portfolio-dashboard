@@ -64,6 +64,18 @@ const navItems = [
     isActive: false,
   },
   {
+    title: "Manage Skills",
+    url: "/skill",
+    icon: BookOpen, // More relevant for blogs
+    isActive: false,
+  },
+  {
+    title: "Create Skill",
+    url: "/skill/create-skill",
+    icon: Edit, // More relevant for blog creation
+    isActive: false,
+  },
+  {
     title: "Profile",
     url: "/profile",
     icon: User,
