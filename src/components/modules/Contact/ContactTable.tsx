@@ -9,10 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Contact } from "@/types/type";
+import { IContact } from "@/types/type";
+// import { Contact } from "@/types/type";
 
 interface ContactTableProps {
-  contact: Contact[];
+  contact: IContact[];
 }
 
 const ContactTable = ({ contact }: ContactTableProps) => {
