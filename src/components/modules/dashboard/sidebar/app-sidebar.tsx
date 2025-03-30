@@ -32,7 +32,7 @@ const navItems = [
     isActive: true,
   },
   {
-    title: "Projects",
+    title: "Manage Projects",
     url: "/projects",
     icon: Folder,
     isActive: false,
