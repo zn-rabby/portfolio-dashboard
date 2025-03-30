@@ -49,3 +49,18 @@ export interface IBlog {
   tags?: string[];
   isDeleted?: boolean;
 }
+
+export interface ISkill {
+  _id: string;
+  icon: string;
+  name: string;
+  description: string;
+  category:
+    | "frontend"
+    | "backend"
+    | "devops"
+    | "tools"
+    | "softSkills"
+    | "others";
+  isDeleted?: boolean;
+}
