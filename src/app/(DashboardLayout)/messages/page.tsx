@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import ManageMessages from "@/components/modules/Contact";
 import { getAllContacts } from "@/service/Contacts";
-import { IContact } from "@/types/user";
+import { IContact } from "@/types/type";
 
 export default async function ContactPage() {
   const data = await getAllContacts();

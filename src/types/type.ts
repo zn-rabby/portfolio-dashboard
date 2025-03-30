@@ -37,3 +37,14 @@ export interface IMeta {
   total: number;
   totalPage: number;
 }
+
+export interface IBlog {
+  title: string;
+  image: string;
+  category: string;
+  author: string;
+  introduction: string;
+  content: string;
+  tags?: string[];
+  isDeleted?: boolean;
+}

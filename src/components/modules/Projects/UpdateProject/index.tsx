@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { updateProjectById } from "@/service/Project";
-import { IProject } from "@/types/user";
+import { IProject } from "@/types/type";
 import RichTextEditor from "@/components/ui/core/RichTextEditor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

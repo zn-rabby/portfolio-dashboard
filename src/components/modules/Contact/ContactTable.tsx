@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Contact } from "@/types/user";
+import { Contact } from "@/types/type";
 
 interface ContactTableProps {
   contact: Contact[];

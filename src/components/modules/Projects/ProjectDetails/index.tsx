@@ -5,7 +5,7 @@ import { PlayCircle, GitFork, Star, Code2, ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IProject } from "@/types/user";
+import { IProject } from "@/types/type";
 
 const renderHtml = (html: string | undefined) => {
   if (!html) return null;

@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { IContact } from "@/types/user";
+import { IContact } from "@/types/type";
 import { deleteContactById } from "@/service/Contacts";
 import {
   AlertDialog,

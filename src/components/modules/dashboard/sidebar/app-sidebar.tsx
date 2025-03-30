@@ -3,12 +3,14 @@
 import * as React from "react";
 import {
   MessageCircle,
-  PlusCircle,
   Folder,
   LayoutDashboard,
   Settings,
   User,
   Home,
+  Edit,
+  BookOpen,
+  PlusSquare,
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +34,12 @@ const navItems = [
     isActive: true,
   },
   {
+    title: "Manage SMS",
+    url: "/messages",
+    icon: MessageCircle,
+    isActive: false,
+  },
+  {
     title: "Manage Projects",
     url: "/projects",
     icon: Folder,
@@ -40,13 +48,19 @@ const navItems = [
   {
     title: "Create Project",
     url: "/projects/create-project",
-    icon: PlusCircle,
+    icon: PlusSquare, // Changed from PlusCircle to be more project-specific
     isActive: false,
   },
   {
-    title: "Messages",
-    url: "/messages",
-    icon: MessageCircle,
+    title: "Manage Blogs",
+    url: "/blogs",
+    icon: BookOpen, // More relevant for blogs
+    isActive: false,
+  },
+  {
+    title: "Create Blog",
+    url: "/projects/create-blog",
+    icon: Edit, // More relevant for blog creation
     isActive: false,
   },
   {

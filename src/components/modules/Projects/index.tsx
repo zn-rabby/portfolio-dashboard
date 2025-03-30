@@ -45,7 +45,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { deleteProjectById } from "@/service/Project";
-import { IProject } from "@/types/user";
+import { IProject } from "@/types/type";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
