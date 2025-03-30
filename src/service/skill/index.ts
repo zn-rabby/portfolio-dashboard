@@ -51,7 +51,7 @@ export const addSkill = async (skillData: any) => {
   }
 };
 
-export const updateBlogById = async (id: string, updatedSkillData: any) => {
+export const updateSkillById = async (id: string, updatedSkillData: any) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/skill/${id}`, {
       method: "PATCH",
