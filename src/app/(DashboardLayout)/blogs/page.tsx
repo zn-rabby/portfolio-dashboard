@@ -1,15 +1,15 @@
 export const dynamic = "force-dynamic";
-import ManageProject from "@/components/modules/Projects";
-import { getAllProjects } from "@/service/Project";
+import ManageBlogs from "@/components/modules/Blog";
+import { getAllBlogs } from "@/service/Blog";
 
 export default async function BlogsPage() {
-  const { data } = await getAllProjects();
-  const projects = data ?? [];
+  const { data } = await getAllBlogs();
+  const blogs = data ?? [];
 
   return (
     <div className="w-full">
       <h2>Blogs</h2>
-      <ManageProject projects={projects} />
+      <ManageBlogs blogs={blogs} />
     </div>
   );
 }
