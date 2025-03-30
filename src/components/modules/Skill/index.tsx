@@ -41,6 +41,16 @@ import { ISkill } from "@/types/type";
 import { Badge } from "@/components/ui/badge";
 import { deleteSkillById } from "@/service/skill";
 
+const renderHtml = (html: string | undefined) => {
+  if (!html) return null;
+  return (
+    <span
+      dangerouslySetInnerHTML={{ __html: html }}
+      className="[&>strong]:font-bold [&>em]:italic [&>u]:underline [&>a]:text-emerald-600 [&>a]:underline [&>a:hover]:text-emerald-800"
+    />
+  );
+};
+
 export default function ManageSkills({ skills }: { skills: ISkill[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -118,7 +128,7 @@ export default function ManageSkills({ skills }: { skills: ISkill[] }) {
       header: "Description",
       cell: ({ row }) => (
         <div className="text-sm text-gray-600 line-clamp-2">
-          {row.getValue("description")}
+          {renderHtml(row.getValue("description"))}
         </div>
       ),
     },
@@ -306,7 +316,7 @@ export default function ManageSkills({ skills }: { skills: ISkill[] }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
