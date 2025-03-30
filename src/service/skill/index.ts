@@ -17,7 +17,7 @@ export const getAllSkills = async () => {
   }
 };
 
-export const getBlogById = async (id: string) => {
+export const getSkillById = async (id: string) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/skill/${id}`, {
       // cache: "no-store",
