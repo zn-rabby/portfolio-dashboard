@@ -2,15 +2,17 @@
 
 import * as React from "react";
 import {
-  MessageCircle,
-  Folder,
   LayoutDashboard,
   Settings,
   User,
   Home,
-  Edit,
-  BookOpen,
   PlusSquare,
+  MessageSquareText,
+  FolderKanban,
+  BookMarked,
+  BookPlus,
+  Wrench,
+  Plus,
 } from "lucide-react";
 import {
   Sidebar,
@@ -30,61 +32,61 @@ const navItems = [
   {
     title: "Dashboard",
     url: "/",
-    icon: LayoutDashboard,
+    icon: LayoutDashboard, // Perfect for overview
     isActive: true,
+  },
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: User, // Standard for user profile
+    isActive: false,
   },
   {
     title: "Manage SMS",
     url: "/messages",
-    icon: MessageCircle,
+    icon: MessageSquareText, // More specific than MessageCircle
     isActive: false,
   },
   {
     title: "Manage Projects",
     url: "/projects",
-    icon: Folder,
+    icon: FolderKanban, // Better for project management
     isActive: false,
   },
   {
     title: "Create Project",
     url: "/projects/create-project",
-    icon: PlusSquare, // Changed from PlusCircle to be more project-specific
+    icon: PlusSquare, // Good for creation actions
     isActive: false,
   },
   {
     title: "Manage Blogs",
     url: "/blogs",
-    icon: BookOpen, // More relevant for blogs
+    icon: BookMarked, // Better for blog management
     isActive: false,
   },
   {
     title: "Create Blog",
     url: "/blogs/create-blog",
-    icon: Edit, // More relevant for blog creation
+    icon: BookPlus, // Specifically for adding blog posts
     isActive: false,
   },
   {
     title: "Manage Skills",
     url: "/skill",
-    icon: BookOpen, // More relevant for blogs
+    icon: Wrench, // Represents skills/tools
     isActive: false,
   },
   {
     title: "Create Skill",
     url: "/skill/create-skill",
-    icon: Edit, // More relevant for blog creation
-    isActive: false,
-  },
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: User,
+    icon: Plus, // Simple for creation
     isActive: false,
   },
   {
     title: "Settings",
     url: "/settings",
-    icon: Settings,
+    icon: Settings, // Standard for settings
     isActive: false,
   },
 ];
@@ -119,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                   <div className="grid flex-1 text-left">
                     <h2 className="font-bold text-lg">Rabby</h2>
-                    <span className="text-xs font-light opacity-90">
+                    <span className="text-sm font-light opacity-90">
                       Dashboard
                     </span>
                   </div>
@@ -130,7 +132,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="p-2 overflow-y-auto">
+      <SidebarContent className="p-2 overflow-y-auto text-lg">
         <NavMain items={navItems} />
       </SidebarContent>
 
